@@ -27,8 +27,11 @@ describe('auto-prefixer for ', () => {
       let actual = applyCssPrefixes(input);
       expect(Array.isArray(actual['display'])).toBeTruthy();
       expect(actual['display'][0]).toEqual('-webkit-box');
-      expect(actual['display'][4]).toEqual('flex');
+
+      // `display:flex` should be last
+      expect(actual['display'][2]).toEqual('flex');
     });
+
   });
 
   /**

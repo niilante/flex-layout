@@ -10,24 +10,23 @@
 export function applyCssPrefixes(target) {
   for (let key in target) {
 
-    let value = target[key];
+    let value = target[key] || "";
+    let boxValue = toBoxValue(value);
+    let boxDirection = toBoxDirection(value);
+    let boxOrient = toBoxOrient(value);
 
     switch (key) {
       case 'display':
         if (value === 'flex') {
           target['display'] = [
             '-webkit-box',
-            '-moz-box',
             '-ms-flexbox',
-            '-webkit-flex',
             'flex'
           ];
         } else if (value === 'inline-flex') {
           target['display'] = [
             '-webkit-inline-box',
-            '-moz-inline-box',
             '-ms-inline-flexbox',
-            '-webkit-inline-flex',
             'inline-flex'
           ];
         } else {
@@ -37,77 +36,72 @@ export function applyCssPrefixes(target) {
 
       case 'flex':
         target['-ms-flex'] = value;
-        target['-webkit-flex'] = value;
         target['-webkit-box-flex'] = value.split(" ")[0];
-        target['-moz-box-flex'] = value.split(" ")[0];
         break;
 
       case 'flex-direction':
         value = value || "row";
-        target['flex-direction'] = value;
+        target['-webkit-box-orient'] = boxOrient;
+        target['-webkit-box-direction'] = boxDirection;
         target['-ms-flex-direction'] = value;
-        target['-webkit-flex-direction'] = value;
-        target['-webkit-box-orient'] = toBoxOrient(value);
-        target['-moz-box-orient'] = toBoxOrient(value);
-        target['-webkit-box-direction'] = toBoxDirection(value);
-        target['-moz-box-direction'] = toBoxDirection(value);
+        target['flex-direction'] = value;
         break;
 
       case 'flex-wrap':
         target['-ms-flex-wrap'] = value;
-        target['-webkit-flex-wrap'] = value;
         break;
 
       case 'flex-grow':
-        target['-webkit-flex-grow'] = value;
+        target['-webkit-box-flex'] = value;
+        target['-ms-flex-positive'] = value;
         break;
 
       case 'flex-shrink':
-        target['-webkit-flex-shrink'] = value;
+        target['-ms-flex-negative'] = value;
         break;
 
       case 'flex-basis':
-        target['-webkit-flex-basis'] = value;
+        target['-ms-flex-preferred-size'] = value;
         break;
 
       case 'flex-flow':
-        target['-webkit-flex-flow'] = value;
+        target['-ms-flex-flow'] = value;
+        target['-webkit-box-orient'] = boxOrient;
+        target['-webkit-box-direction'] = boxDirection;
+        target['-ms-flex-flow'] =  value;
+
         break;
 
       case 'order':
         if (isNaN(value)) {
           value = "0";
         }
-        target['order'] = value;
-        target['-webkit-order'] = value;
         target['-ms-flex-order'] = value;
-        target['-moz-box-ordinal-group'] = toBoxOrdinal(value);
         target['-webkit-box-ordinal-group'] = toBoxOrdinal(value);
+        target['order'] = value;
         break;
 
       case 'justify-content':
-        target['-ms-flex-pack'] = toBoxValue(value);
-        target['-webkit-box-pack'] = toBoxValue(value);
-        target['-moz-box-pack'] = toBoxValue(value);
-        target['-webkit-justify-content'] = value;
+        target['-ms-flex-pack'] = boxValue;
+        target['-webkit-box-pack'] = boxValue;
+        target[key] = value;
         break;
 
       case 'align-items':
-        target['-ms-flex-align'] = toBoxValue(value);
-        target['-webkit-box-align'] = toBoxValue(value);
-        target['-moz-box-align'] = toBoxValue(value);
-        target['-webkit-align-items'] = toBoxValue(value);
+        target['-ms-flex-align'] = boxValue;
+        target['-webkit-box-align'] = boxValue;
+        target[key] = value;
         break;
 
       case 'align-self':
-        target['-ms-flex-item-align'] = toBoxValue(value);
         target['-webkit-align-self'] = value;
+        target['-ms-flex-item-align'] = boxValue;
+        target[key] = value;
         break;
 
       case 'align-content':
-        target['-ms-align-content'] = toAlignContentValue(value);
         target['-ms-flex-line-pack'] = toAlignContentValue(value);
-        target['-webkit-align-content'] = value;
+        target[key] = value;
         break;
     }
   }
@@ -137,7 +131,6 @@ export function toBoxOrient(flexDirection = 'row') {
 
 /** Convert flex Direction to Box direction type */
 export function toBoxDirection(flexDirection = 'row') {
-
   return flexDirection.indexOf('reverse') !== -1 ? 'reverse' : 'normal';
 }
 
