@@ -23,6 +23,31 @@ export type StyleDefinition = string|{[property: string]: string|number};
 /** Abstract base class for the Layout API styling directives. */
 export abstract class BaseFxDirective implements OnDestroy {
 
+  /**
+   * Imperatively determine the current activated [input] value;
+   * if called before ngOnInit() this will return `undefined`
+   */
+  get activatedValue():string|number {
+    return this._mqActivation ? this._mqActivation.activatedInput : undefined;
+  }
+
+  /**
+   * Change the currently activated input value and force-update
+   * the injected CSS (by-passing change detection).
+   *
+   * NOTE: Other input keys will NOT be affected.
+   */
+  set activatedValue(value:string|number ) {
+    if ( !this._mqActivation ) {
+      this._updateStyle(value);
+      return;
+    }
+
+    let activatedKey = this._mqActivation.activatedInputKey;
+    this._inputMap[activatedKey] = value;
+    this._updateStyle(value);
+  }
+
   get hasMediaQueryListener() {
     return !!this._mqActivation;
   }
@@ -63,6 +88,13 @@ export abstract class BaseFxDirective implements OnDestroy {
   // *********************************************
   // Protected Methods
   // *********************************************
+
+  /**
+   * Abstract method...
+   */
+  protected _updateStyle(value?: string|number) {
+
+  }
 
   /**
    * Was the directive's default selector used ?
